@@ -1,6 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
-function splitIntoMoras(text) {
+interface PitchLevels {
+  [key: string]: boolean;
+}
+
+function splitIntoMoras(text: string): string[] {
   const moraRegex =
     /[んン]|[ぁ-ゖ]ゃ|[ぁ-ゖ]ゅ|[ぁ-ゖ]ょ|[ぁ-ゖー]|[ァ-ヴ]ャ|[ァ-ヴ]ュ|[ァ-ヴ]ョ|[ァ-ヴー]/g;
   const moras = text.match(moraRegex) || [text];
@@ -8,16 +12,15 @@ function splitIntoMoras(text) {
 }
 
 export function PitchAccentViz() {
-  const [inputText, setText] = useState("こんにちは");
-  const [pitchLevels, setPitchLevels] = useState({});
+  const [inputText, setText] = useState<string>("こんにちは");
+  const [pitchLevels, setPitchLevels] = useState<PitchLevels>({});
 
   const moras = splitIntoMoras(inputText);
-  const MORA_WIDTH = 60; // Width allocated for each mora
+  const MORA_WIDTH = 80; // Width allocated for each mora
   const svgWidth = moras.length * MORA_WIDTH;
 
-  const togglePitch = (mora) => {
-    console.log(mora);
-    setPitchLevels((prev) => ({
+  const togglePitch = (mora: string) => {
+    setPitchLevels((prev: PitchLevels) => ({
       ...prev,
       [mora]: !prev[mora],
     }));
