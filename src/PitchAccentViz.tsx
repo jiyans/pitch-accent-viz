@@ -11,7 +11,7 @@ function splitIntoMoras(text: string): string[] {
 }
 
 export function PitchAccentViz() {
-  const [inputText, setText] = useState<string>('こんにちは');
+  const [inputText, setText] = useState<string>('だだだだんご');
   const [isCopied, setIsCopied] = useState(false);
   const [pitchLevels, setPitchLevels] = useState<PitchLevels>({});
 
@@ -51,8 +51,9 @@ export function PitchAccentViz() {
     }
   };
 
-  const togglePitch = (mora: string) => {
-    setPitchLevels((prev: PitchLevels) => ({ ...prev, [mora]: !prev[mora] }));
+  const togglePitch = (mora: string, index: number) => {
+    const uniqueKey = `${mora}-${index}`;
+    setPitchLevels((prev: PitchLevels) => ({ ...prev, [uniqueKey]: !prev[uniqueKey] }));
   };
 
   const renderPitchGraph = () => {
@@ -60,7 +61,7 @@ export function PitchAccentViz() {
 
     moras.forEach((mora, index) => {
       const x = index * MORA_WIDTH + MORA_WIDTH / 2;
-      const y = pitchLevels[mora] ? 10 : 30;
+      const y = pitchLevels[`${mora}-${index}`] ? 10 : 30;
 
       if (index === 0) {
         pathD = `M ${x},${y}`;
@@ -74,8 +75,8 @@ export function PitchAccentViz() {
         <path d={pathD} stroke="#fbf0df" strokeWidth="2" fill="none" />
         {moras.map((mora, index) => {
           const x = index * MORA_WIDTH + MORA_WIDTH / 2;
-          const y = pitchLevels[mora] ? 10 : 30;
-          return <circle key={index} cx={x} cy={y} r="7" fill="#fbf0df" onClick={() => togglePitch(mora)} className="cursor-pointer" />;
+          const y = pitchLevels[`${mora}-${index}`] ? 10 : 30;
+          return <circle key={index} cx={x} cy={y} r="9" fill="#fbf0df" onClick={() => togglePitch(mora, index)} className="cursor-pointer" />;
         })}
       </svg>
     );
@@ -83,37 +84,41 @@ export function PitchAccentViz() {
 
   return (
     <div className="mt-6 mx-auto w-full max-w-2xl text-left flex flex-col gap-4">
-      <input
-        type="text"
-        name="inputWord"
-        value={inputText}
-        onChange={(e) => setText(e.target.value)}
-        className="w-full bg-[#1a1a1a] border-2 border-[#fbf0df] rounded-xl p-3 text-[#fbf0df] font-mono resize-y focus:border-[#f3d5a3] placeholder-[#fbf0df]/40"
-        placeholder="Enter Japanese text"
-      />
-      <div className="relative flex flex-col items-center">
+      <div className="flex gap-3 w-full">
+        <input
+          type="text"
+          name="inputWord"
+          value={inputText}
+          onChange={(e) => setText(e.target.value)}
+          className="flex-9 bg-[#1a1a1a] border-2 border-[#fbf0df] rounded-xl p-3
+        text-[#fbf0df] font-mono focus:border-[#f3d5a3]
+        placeholder-[#fbf0df]/40"
+          placeholder="Enter Japanese text"
+        />
+        <button
+          onClick={copyToClipboard}
+          className="px-4 bg-[#1a1a1a] text-[#fbf0df] border-2 border-[#fbf0df]
+          rounded-xl hover:bg-[#2a2a2a] hover:border-[#f3d5a3] transition-all
+          duration-200 font-mono flex-1"
+        >
+          {isCopied ? 'Copied!' : 'Copy'}
+        </button>
+      </div>
+      <div className="relative flex flex-col items-center ">
         <div className="min-h-[180px] bg-[#1a1a1a] rounded-xl p-3 flex flex-col items-center justify-center">
           {renderPitchGraph()}
-          <div className="flex" style={{ width: svgWidth }}>
+          <div className="flex">
             {moras.map((mora, index) => (
               <span
-                key={index}
+                key={`${mora}-${index}`}
                 className="text-[#fbf0df] font-mono text-4xl cursor-pointer text-center"
                 style={{ width: MORA_WIDTH }}
-                onClick={() => togglePitch(mora)}
+                onClick={() => togglePitch(mora, index)}
               >
                 {mora}
               </span>
             ))}
           </div>
-
-          <button
-            onClick={copyToClipboard}
-            className="mt-4 px-4 py-2 bg-[#fbf0df] text-[#1a1a1a] rounded-lg
-      hover:bg-[#f3d5a3] transition-colors"
-          >
-            {isCopied ? 'Copied!' : 'Copy to Clipboard'}
-          </button>
         </div>
       </div>
     </div>
