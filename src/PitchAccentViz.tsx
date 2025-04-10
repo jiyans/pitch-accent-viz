@@ -12,7 +12,7 @@ export function PitchAccentViz() {
   const [pitchLevels, setPitchLevels] = useState({});
 
   const moras = splitIntoMoras(inputText);
-  const MORA_WIDTH = 40; // Width allocated for each mora
+  const MORA_WIDTH = 60; // Width allocated for each mora
   const svgWidth = moras.length * MORA_WIDTH;
 
   const togglePitch = (index) => {
@@ -47,7 +47,7 @@ export function PitchAccentViz() {
               key={index}
               cx={x}
               cy={y}
-              r="3"
+              r="7"
               fill="#fbf0df"
               onClick={() => togglePitch(index)}
               className="cursor-pointer"
