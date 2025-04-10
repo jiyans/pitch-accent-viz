@@ -1,18 +1,17 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 interface PitchLevels {
   [key: string]: boolean;
 }
 
 function splitIntoMoras(text: string): string[] {
-  const moraRegex =
-    /[んン]|[ぁ-ゖ]ゃ|[ぁ-ゖ]ゅ|[ぁ-ゖ]ょ|[ぁ-ゖー]|[ァ-ヴ]ャ|[ァ-ヴ]ュ|[ァ-ヴ]ョ|[ァ-ヴー]/g;
+  const moraRegex = /[んン]|[ぁ-ゖ]ゃ|[ぁ-ゖ]ゅ|[ぁ-ゖ]ょ|[ぁ-ゖー]|[ァ-ヴ]ャ|[ァ-ヴ]ュ|[ァ-ヴ]ョ|[ァ-ヴー]/g;
   const moras = text.match(moraRegex) || [text];
   return moras;
 }
 
 export function PitchAccentViz() {
-  const [inputText, setText] = useState<string>("こんにちは");
+  const [inputText, setText] = useState<string>('こんにちは');
   const [pitchLevels, setPitchLevels] = useState<PitchLevels>({});
 
   const moras = splitIntoMoras(inputText);
@@ -20,14 +19,11 @@ export function PitchAccentViz() {
   const svgWidth = moras.length * MORA_WIDTH;
 
   const togglePitch = (mora: string) => {
-    setPitchLevels((prev: PitchLevels) => ({
-      ...prev,
-      [mora]: !prev[mora],
-    }));
+    setPitchLevels((prev: PitchLevels) => ({ ...prev, [mora]: !prev[mora] }));
   };
 
   const renderPitchGraph = () => {
-    let pathD = "";
+    let pathD = '';
 
     moras.forEach((mora, index) => {
       const x = index * MORA_WIDTH + MORA_WIDTH / 2;
@@ -41,29 +37,19 @@ export function PitchAccentViz() {
     });
 
     return (
-      <svg width={svgWidth} height="40" className="mb-2">
+      <svg width={svgWidth} height="60" className="mb-2">
         <path d={pathD} stroke="#fbf0df" strokeWidth="2" fill="none" />
         {moras.map((mora, index) => {
           const x = index * MORA_WIDTH + MORA_WIDTH / 2;
           const y = pitchLevels[mora] ? 10 : 30;
-          return (
-            <circle
-              key={index}
-              cx={x}
-              cy={y}
-              r="7"
-              fill="#fbf0df"
-              onClick={() => togglePitch(mora)}
-              className="cursor-pointer"
-            />
-          );
+          return <circle key={index} cx={x} cy={y} r="7" fill="#fbf0df" onClick={() => togglePitch(mora)} className="cursor-pointer" />;
         })}
       </svg>
     );
   };
 
   return (
-    <div className="mt-8 mx-auto w-full max-w-2xl text-left flex flex-col gap-4">
+    <div className="mt-6 mx-auto w-full max-w-2xl text-left flex flex-col gap-4">
       <input
         type="text"
         name="inputWord"
