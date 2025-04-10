@@ -1,5 +1,5 @@
 import "./index.css";
-import { APITester } from "./APITester";
+import { PitchAccentViz as PitchAccentViz } from "./PitchAccentViz";
 
 import logo from "./logo.svg";
 import reactLogo from "./react.svg";
@@ -11,7 +11,7 @@ export function App() {
       <p>
         下記のBox に高低アクセントを入れてみてほしい。
       </p>
-      <APITester />
+      <PitchAccentViz />
     </div>
   );
 }
