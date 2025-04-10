@@ -15,19 +15,20 @@ export function PitchAccentViz() {
   const MORA_WIDTH = 60; // Width allocated for each mora
   const svgWidth = moras.length * MORA_WIDTH;
 
-  const togglePitch = (index) => {
+  const togglePitch = (mora) => {
+    console.log(mora);
     setPitchLevels((prev) => ({
       ...prev,
-      [index]: !prev[index],
+      [mora]: !prev[mora],
     }));
   };
 
   const renderPitchGraph = () => {
     let pathD = "";
 
-    moras.forEach((_, index) => {
+    moras.forEach((mora, index) => {
       const x = index * MORA_WIDTH + MORA_WIDTH / 2;
-      const y = pitchLevels[index] ? 10 : 30;
+      const y = pitchLevels[mora] ? 10 : 30;
 
       if (index === 0) {
         pathD = `M ${x},${y}`;
@@ -39,9 +40,9 @@ export function PitchAccentViz() {
     return (
       <svg width={svgWidth} height="40" className="mb-2">
         <path d={pathD} stroke="#fbf0df" strokeWidth="2" fill="none" />
-        {moras.map((_, index) => {
+        {moras.map((mora, index) => {
           const x = index * MORA_WIDTH + MORA_WIDTH / 2;
-          const y = pitchLevels[index] ? 10 : 30;
+          const y = pitchLevels[mora] ? 10 : 30;
           return (
             <circle
               key={index}
@@ -49,7 +50,7 @@ export function PitchAccentViz() {
               cy={y}
               r="7"
               fill="#fbf0df"
-              onClick={() => togglePitch(index)}
+              onClick={() => togglePitch(mora)}
               className="cursor-pointer"
             />
           );
@@ -77,7 +78,7 @@ export function PitchAccentViz() {
                 key={index}
                 className="text-[#fbf0df] font-mono text-4xl cursor-pointer text-center"
                 style={{ width: MORA_WIDTH }}
-                onClick={() => togglePitch(index)}
+                onClick={() => togglePitch(mora)}
               >
                 {mora}
               </span>
