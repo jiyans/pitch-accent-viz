@@ -12,11 +12,44 @@ function splitIntoMoras(text: string): string[] {
 
 export function PitchAccentViz() {
   const [inputText, setText] = useState<string>('こんにちは');
+  const [isCopied, setIsCopied] = useState(false);
   const [pitchLevels, setPitchLevels] = useState<PitchLevels>({});
 
   const moras = splitIntoMoras(inputText);
   const MORA_WIDTH = 80; // Width allocated for each mora
   const svgWidth = moras.length * MORA_WIDTH;
+
+  const copyToClipboard = async () => {
+    try {
+      const html = `
+      <div style="font-family: monospace;">
+        <div style="margin-bottom: 10px;">
+          ${moras
+            .map(
+              (mora, index) =>
+                ` <span style="display: inline-block; min-width: ${MORA_WIDTH}px; text-align: center;"> ${pitchLevels[mora] ? '↑' : '↓'} </span> `,
+            )
+            .join('')}
+        </div>
+        <div>
+          ${moras
+            .map((mora, index) => ` <span style="display: inline-block; min-width: ${MORA_WIDTH}px; text-align: center;"> ${mora} </span> `)
+            .join('')}
+        </div>
+      </div>
+    `;
+
+      // Create a Blob with HTML content
+      const blob = new Blob([html], { type: 'text/html' });
+      const clipboardItem = new ClipboardItem({ 'text/html': blob });
+
+      await navigator.clipboard.write([clipboardItem]);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000); // Reset copied state after 2 seconds
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
 
   const togglePitch = (mora: string) => {
     setPitchLevels((prev: PitchLevels) => ({ ...prev, [mora]: !prev[mora] }));
@@ -73,6 +106,14 @@ export function PitchAccentViz() {
               </span>
             ))}
           </div>
+
+          <button
+            onClick={copyToClipboard}
+            className="mt-4 px-4 py-2 bg-[#fbf0df] text-[#1a1a1a] rounded-lg
+      hover:bg-[#f3d5a3] transition-colors"
+          >
+            {isCopied ? 'Copied!' : 'Copy to Clipboard'}
+          </button>
         </div>
       </div>
     </div>
