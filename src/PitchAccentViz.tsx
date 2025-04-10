@@ -8,7 +8,7 @@ function splitIntoMoras(text) {
 }
 
 export function PitchAccentViz() {
-  const [inputText, setText] = useState("こんは");
+  const [inputText, setText] = useState("こんにちは");
   const [pitchLevels, setPitchLevels] = useState({});
 
   const moras = splitIntoMoras(inputText);
