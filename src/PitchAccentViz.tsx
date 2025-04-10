@@ -59,7 +59,7 @@ export function PitchAccentViz() {
         placeholder="Enter Japanese text"
       />
       <div className="relative flex flex-col items-center">
-        <div className="w-full min-h-[140px] bg-[#1a1a1a] rounded-xl p-3 flex flex-col items-center justify-center">
+        <div className="min-h-[180px] bg-[#1a1a1a] rounded-xl p-3 flex flex-col items-center justify-center">
           {renderPitchGraph()}
           <div className="flex" style={{ width: svgWidth }}>
             {moras.map((mora, index) => (
