@@ -16,12 +16,12 @@ export function PitchAccentViz() {
   const [pitchLevels, setPitchLevels] = useState<PitchLevels>({});
 
   const moras = splitIntoMoras(inputText);
-  const [moraWidth, setMoraWidth] = useState(window.innerWidth < 640 ? 40 : 80);
+  const [moraWidth, setMoraWidth] = useState(window.innerWidth < 768 ? 40 : 80);
 
   const svgWidth = moras.length * moraWidth;
   useEffect(() => {
     const handleResize = () => {
-      setMoraWidth(window.innerWidth < 640 ? 40 : 80);
+      setMoraWidth(window.innerWidth < 768 ? 40 : 80);
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -34,15 +34,13 @@ export function PitchAccentViz() {
         <div style="margin-bottom: 10px;">
           ${moras
             .map(
-              (mora, index) =>
+              (mora, _) =>
                 ` <span style="display: inline-block; min-width: ${moraWidth}px; text-align: center;"> ${pitchLevels[mora] ? '↑' : '↓'} </span> `,
             )
             .join('')}
         </div>
         <div>
-          ${moras
-            .map((mora, index) => ` <span style="display: inline-block; min-width: ${moraWidth}px; text-align: center;"> ${mora} </span> `)
-            .join('')}
+          ${moras.map((mora, _) => ` <span style="display: inline-block; min-width: ${moraWidth}px; text-align: center;"> ${mora} </span> `).join('')}
         </div>
       </div>
     `;
