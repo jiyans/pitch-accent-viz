@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface PitchLevels {
   [key: string]: boolean;
@@ -16,16 +16,27 @@ export function PitchAccentViz() {
   const [pitchLevels, setPitchLevels] = useState<PitchLevels>({});
 
   const moras = splitIntoMoras(inputText);
-  const [moraWidth, setMoraWidth] = useState(window.innerWidth < 768 ? 40 : 80);
 
-  const svgWidth = moras.length * moraWidth;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+
   useEffect(() => {
-    const handleResize = () => {
-      setMoraWidth(window.innerWidth < 768 ? 40 : 80);
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.clientWidth);
+      }
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
   }, []);
+
+  const moraWidth = Math.min(
+    Math.max(60, (containerWidth - 40) / moras.length), // minimum 40px, subtract padding
+    300, // maximum width
+  );
+  const svgWidth = moras.length * moraWidth;
 
   const copyToClipboard = async () => {
     try {
@@ -89,7 +100,7 @@ export function PitchAccentViz() {
   };
 
   return (
-    <div className="mt-6 mx-auto w-full max-w-2xl text-left flex flex-col gap-4">
+    <div ref={containerRef} className="mt-6 mx-auto w-full max-w-[640px] text-left flex flex-col gap-4">
       <div className="flex gap-3 w-full">
         <input
           type="text"
