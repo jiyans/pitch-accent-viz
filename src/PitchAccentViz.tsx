@@ -130,7 +130,10 @@ export function PitchAccentViz() {
               <span
                 key={`${mora}-${index}`}
                 className="text-[#fbf0df] font-mono text-4xl cursor-pointer text-center"
-                style={{ width: moraWidth }}
+                style={{
+                  width: moraWidth,
+                  fontSize: `${Math.max(Math.min(moraWidth * 0.6, 36), 16)}px`,
+                }}
                 onClick={() => togglePitch(mora, index)}
               >
                 {mora}
