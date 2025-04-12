@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface PitchLevels {
   [key: string]: boolean;
@@ -16,8 +16,16 @@ export function PitchAccentViz() {
   const [pitchLevels, setPitchLevels] = useState<PitchLevels>({});
 
   const moras = splitIntoMoras(inputText);
-  const MORA_WIDTH = 80; // Width allocated for each mora
-  const svgWidth = moras.length * MORA_WIDTH;
+  const [moraWidth, setMoraWidth] = useState(window.innerWidth < 640 ? 40 : 80);
+
+  const svgWidth = moras.length * moraWidth;
+  useEffect(() => {
+    const handleResize = () => {
+      setMoraWidth(window.innerWidth < 640 ? 40 : 80);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const copyToClipboard = async () => {
     try {
@@ -27,13 +35,13 @@ export function PitchAccentViz() {
           ${moras
             .map(
               (mora, index) =>
-                ` <span style="display: inline-block; min-width: ${MORA_WIDTH}px; text-align: center;"> ${pitchLevels[mora] ? '↑' : '↓'} </span> `,
+                ` <span style="display: inline-block; min-width: ${moraWidth}px; text-align: center;"> ${pitchLevels[mora] ? '↑' : '↓'} </span> `,
             )
             .join('')}
         </div>
         <div>
           ${moras
-            .map((mora, index) => ` <span style="display: inline-block; min-width: ${MORA_WIDTH}px; text-align: center;"> ${mora} </span> `)
+            .map((mora, index) => ` <span style="display: inline-block; min-width: ${moraWidth}px; text-align: center;"> ${mora} </span> `)
             .join('')}
         </div>
       </div>
@@ -60,7 +68,7 @@ export function PitchAccentViz() {
     let pathD = '';
 
     moras.forEach((mora, index) => {
-      const x = index * MORA_WIDTH + MORA_WIDTH / 2;
+      const x = index * moraWidth + moraWidth / 2;
       const y = pitchLevels[`${mora}-${index}`] ? 10 : 30;
 
       if (index === 0) {
@@ -74,7 +82,7 @@ export function PitchAccentViz() {
       <svg width={svgWidth} height="60" className="mb-2">
         <path d={pathD} stroke="#fbf0df" strokeWidth="2" fill="none" />
         {moras.map((mora, index) => {
-          const x = index * MORA_WIDTH + MORA_WIDTH / 2;
+          const x = index * moraWidth + moraWidth / 2;
           const y = pitchLevels[`${mora}-${index}`] ? 10 : 30;
           return <circle key={index} cx={x} cy={y} r="9" fill="#fbf0df" onClick={() => togglePitch(mora, index)} className="cursor-pointer" />;
         })}
@@ -112,7 +120,7 @@ export function PitchAccentViz() {
               <span
                 key={`${mora}-${index}`}
                 className="text-[#fbf0df] font-mono text-4xl cursor-pointer text-center"
-                style={{ width: MORA_WIDTH }}
+                style={{ width: moraWidth }}
                 onClick={() => togglePitch(mora, index)}
               >
                 {mora}
