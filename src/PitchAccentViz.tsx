@@ -33,8 +33,8 @@ export function PitchAccentViz() {
   }, []);
 
   const moraWidth = Math.min(
-    Math.max(60, (containerWidth - 40) / moras.length), // minimum 40px, subtract padding
-    300, // maximum width
+    (containerWidth - 32) / moras.length, // available width divided by number of moras
+    80, // max width per mora
   );
   const svgWidth = moras.length * moraWidth;
 
@@ -93,7 +93,8 @@ export function PitchAccentViz() {
         {moras.map((mora, index) => {
           const x = index * moraWidth + moraWidth / 2;
           const y = pitchLevels[`${mora}-${index}`] ? 10 : 30;
-          return <circle key={index} cx={x} cy={y} r="9" fill="#fbf0df" onClick={() => togglePitch(mora, index)} className="cursor-pointer" />;
+          const r = moraWidth / 4;
+          return <circle key={index} cx={x} cy={y} r={r} fill="#fbf0df" onClick={() => togglePitch(mora, index)} className="cursor-pointer" />;
         })}
       </svg>
     );
@@ -122,7 +123,7 @@ export function PitchAccentViz() {
         </button>
       </div>
       <div className="relative flex flex-col items-center ">
-        <div className="min-h-[180px] bg-[#1a1a1a] rounded-xl p-3 flex flex-col items-center justify-center">
+        <div className="min-h-[240px] bg-[#1a1a1a] rounded-xl p-3 flex flex-col items-center justify-center">
           {renderPitchGraph()}
           <div className="flex">
             {moras.map((mora, index) => (
