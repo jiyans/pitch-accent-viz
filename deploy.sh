@@ -1,33 +1,30 @@
-#!/bin/bash
-# Script to deploy pitch-accent-viz application
-# Usage: ./deploy.sh
-
 REMOTE_HOST="jiyanjs"
 APP_DIR="/home/ubuntu/websites/pitch-accent-viz"
 
 echo "Starting deployment..."
 
-# Connect to remote server and execute commands
-ssh $REMOTE_HOST "
-    cd $APP_DIR || { echo 'Error: Unable to navigate to $APP_DIR'; exit 1; }
-    echo 'Current directory:' \$(pwd)
+ssh -t $REMOTE_HOST "
+    cd $APP_DIR || exit 1;
+    echo 'Current directory:' \$(pwd);
 
-    # Pull latest changes
-    echo 'Pulling latest changes...'
-    git pull
+    echo 'Setting build permissions...';
+    sudo chown -R ubuntu:ubuntu .;
 
-    # Install dependencies if needed
-    echo 'Installing dependencies...'
-    bun install
+    echo 'Pulling latest changes...';
+    git pull;
 
-    # Build the application
-    echo 'Building application...'
-    bun run build
+    echo 'Installing dependencies...';
+    \$HOME/.bun/bin/bun install;
 
-    # Fix permissions for nginx
-    echo 'Setting permissions...'
-    sudo chown -R www-data:www-data dist/
-    sudo chmod -R 755 dist/
+    echo 'Removing old build...';
+    [ -d dist ] && sudo rm -rf dist;
 
-    echo 'Deployment completed successfully!'
+    echo 'Building application...';
+    \$HOME/.bun/bin/bun run build;
+
+    echo 'Setting nginx permissions...';
+    sudo chown -R www-data:www-data dist/;
+    sudo chmod -R 755 dist/;
+
+    echo 'Done!';
 "
