@@ -78,7 +78,7 @@ export function PitchAccentViz() {
 
     moras.forEach((mora, index) => {
       const x = index * moraWidth + moraWidth / 2;
-      const y = pitchLevels[`${mora}-${index}`] ? 10 : 30;
+      const y = pitchLevels[`${mora}-${index}`] ? 20 : 40;
 
       if (index === 0) {
         pathD = `M ${x},${y}`;
@@ -92,7 +92,7 @@ export function PitchAccentViz() {
         <path d={pathD} stroke="#fbf0df" strokeWidth="2" fill="none" />
         {moras.map((mora, index) => {
           const x = index * moraWidth + moraWidth / 2;
-          const y = pitchLevels[`${mora}-${index}`] ? 10 : 30;
+          const y = pitchLevels[`${mora}-${index}`] ? 20 : 40;
           const r = moraWidth / 4;
           return <circle key={index} cx={x} cy={y} r={r} fill="#fbf0df" onClick={() => togglePitch(mora, index)} className="cursor-pointer" />;
         })}
