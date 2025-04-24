@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { toPng } from 'html-to-image';
 
 interface PitchLevels {
   [key: string]: boolean;
@@ -16,7 +17,7 @@ export function PitchAccentViz() {
   const [pitchLevels, setPitchLevels] = useState<PitchLevels>({});
 
   const moras = splitIntoMoras(inputText);
-
+  const outputRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
 
@@ -33,36 +34,33 @@ export function PitchAccentViz() {
   }, []);
 
   const moraWidth = Math.min(
-    (containerWidth - 32) / moras.length, // available width divided by number of moras
-    80, // max width per mora
+    (containerWidth - 32) / moras.length,
+    80,
   );
   const svgWidth = moras.length * moraWidth;
 
   const copyToClipboard = async () => {
+    if (!outputRef.current) return;
+
     try {
-      const html = `
-      <div style="font-family: monospace;">
-        <div style="margin-bottom: 10px;">
-          ${moras
-            .map(
-              (mora, _) =>
-                ` <span style="display: inline-block; min-width: ${moraWidth}px; text-align: center;"> ${pitchLevels[mora] ? '↑' : '↓'} </span> `,
-            )
-            .join('')}
-        </div>
-        <div>
-          ${moras.map((mora, _) => ` <span style="display: inline-block; min-width: ${moraWidth}px; text-align: center;"> ${mora} </span> `).join('')}
-        </div>
-      </div>
-    `;
+      const dataUrl = await toPng(outputRef.current, {
+        backgroundColor: '#1a1a1a',
+        quality: 1,
+        pixelRatio: 2, // Higher quality
+      });
 
-      // Create a Blob with HTML content
-      const blob = new Blob([html], { type: 'text/html' });
-      const clipboardItem = new ClipboardItem({ 'text/html': blob });
+      // Convert data URL to blob
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
 
-      await navigator.clipboard.write([clipboardItem]);
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          [blob.type]: blob,
+        }),
+      ]);
+
       setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000); // Reset copied state after 2 seconds
+      setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
     }
@@ -122,8 +120,11 @@ export function PitchAccentViz() {
           {isCopied ? 'Copied!' : 'Copy'}
         </button>
       </div>
-      <div className="relative flex flex-col items-center ">
-        <div className="min-h-[240px] bg-[#1a1a1a] rounded-xl p-3 flex flex-col items-center justify-center">
+      <div className="relative flex flex-col items-center">
+        <div
+          ref={outputRef}
+          className="min-h-[240px] bg-[#1a1a1a] rounded-xl p-3 flex flex-col items-center justify-center"
+        >
           {renderPitchGraph()}
           <div className="flex">
             {moras.map((mora, index) => (
