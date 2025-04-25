@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { toPng } from 'html-to-image';
 
 interface PitchLevels {
   [key: string]: boolean;
@@ -33,38 +32,43 @@ export function PitchAccentViz() {
     return () => window.removeEventListener('resize', updateWidth);
   }, []);
 
-  const moraWidth = Math.min(
-    (containerWidth - 32) / moras.length,
-    80,
-  );
+  const moraWidth = Math.min((containerWidth - 32) / moras.length, 80);
   const svgWidth = moras.length * moraWidth;
 
-  const copyToClipboard = async () => {
-    if (!outputRef.current) return;
+  const svgToPng = async (svgString: string, scale = 0.5) => {
 
-    try {
-      const dataUrl = await toPng(outputRef.current, {
-        backgroundColor: '#1a1a1a',
-        quality: 1,
-        pixelRatio: 2, // Higher quality
-      });
+    const img = new Image();
+    img.src = `data:image/svg+xml;base64,${btoa(svgString)}`;
 
-      // Convert data URL to blob
-      const res = await fetch(dataUrl);
-      const blob = await res.blob();
+    await new Promise((resolve) => { img.onload = resolve; });
 
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          [blob.type]: blob,
-        }),
-      ]);
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width * scale;
+    canvas.height = img.height * scale;
 
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-    }
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    return new Promise<Blob>((resolve) => {
+      canvas.toBlob((blob) => blob && resolve(blob), 'image/png');
+    });
   };
+  const getSvgString = () => {
+    const svg = document.querySelector('.pitch-graph svg');
+    return svg ? new XMLSerializer().serializeToString(svg) : '';
+  };
+  const copyToClipboard = async () => {
+    const svgString = getSvgString();
+    if (!svgString) return;
+
+    const blob = await svgToPng(svgString); // half size
+    await navigator.clipboard.write([
+      new ClipboardItem({ 'image/png': blob })
+    ]);
+
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  }
 
   const togglePitch = (mora: string, index: number) => {
     const uniqueKey = `${mora}-${index}`;
