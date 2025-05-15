@@ -40,22 +40,12 @@ export function PitchAccentViz() {
     if (!outputRef.current) return;
 
     try {
-      const dataUrl = await toPng(outputRef.current, {
-        backgroundColor: '#1a1a1a',
-        quality: 1,
-        pixelRatio: 2, // Higher quality
-      });
+      const dataUrl = await toPng(outputRef.current, { backgroundColor: '#1a1a1a', quality: 1, pixelRatio: 2 });
 
-      // Convert data URL to blob
       const res = await fetch(dataUrl);
       const blob = await res.blob();
 
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          [blob.type]: blob,
-        }),
-      ]);
-
+      await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
     } catch (err) {
